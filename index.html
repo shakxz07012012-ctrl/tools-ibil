@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>IBIL TOOLS · Konverter + Kalkulator + Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #c2e2f2, #9bc1d9);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 40px;
+            padding: 20px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: 1px solid #cae3f0;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #195e82;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .badge {
+            background: #1e6f9c;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 13px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .tab-btn {
+            background: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1a5e82;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            flex: 1;
+            min-width: 140px;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #1e6f9c;
+            color: white;
+            box-shadow: 0 6px 14px rgba(30,111,156,0.3);
+        }
+
+        .panel {
+            display: none;
+            background: white;
+            border-radius: 36px;
+            padding: 28px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .panel.active-panel {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #cbe3ef;
+            border-radius: 28px;
+            font-size: 15px;
+            margin: 8px 0 16px;
+            font-family: monospace;
+        }
+
+        button {
+            background: #1e6f9c;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #f2f9fe;
+            padding: 20px;
+            border-radius: 32px;
+            margin-top: 20px;
+            border: 1px solid #cde3ef;
+        }
+
+        .currency-result {
+            font-size: 28px;
+            font-weight: bold;
+            color: #195e82;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .calc-btn {
+            background: #e5f0f7;
+            color: #1a5e82;
+            font-size: 20px;
+            padding: 14px;
+            text-align: center;
+            border-radius: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+
+        .calc-btn:active {
+            background: #bdd8ea;
+            transform: scale(0.96);
+        }
+
+        .calc-screen {
+            background: #1e2f3a;
+            color: #bbf0ff;
+            padding: 20px;
+            font-size: 28px;
+            text-align: right;
+            border-radius: 32px;
+            font-family: monospace;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <h1>
+             IBIL TOOLS ★
+            <span class="badge">konverter uang + kalkulator + notes kilat</span>
+        </h1>
+        <p style="color:#386a86; margin-top: 8px;">💱 mata uang realtime · 🧮 kalkulator lengkap · 📝 catatan cepat (hilang saat reload)</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="tab1">💱 Konverter Uang</button>
+        <button class="tab-btn" data-tab="tab2">🧮 Kalkulator</button>
+        <button class="tab-btn" data-tab="tab3">📝 Notes Cepat</button>
+    </div>
+
+    <!-- PANEL 1: KONVERTER MATA UANG -->
+    <div id="tab1" class="panel active-panel">
+        <h3 style="margin-bottom: 16px;">💱 Konverter Mata Uang (kurs real-time)</h3>
+        <div class="grid-2">
+            <div>
+                <label>💰 Jumlah:</label>
+                <input type="number" id="amount" value="100" step="any">
+                <label>🪙 Dari:</label>
+                <select id="fromCurrency">
+                    <option value="USD">USD - Dolar AS</option>
+                    <option value="IDR" selected>IDR - Rupiah</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="JPY">JPY - Yen Jepang</option>
+                    <option value="GBP">GBP - Poundsterling</option>
+                    <option value="SGD">SGD - Dolar Singapura</option>
+                    <option value="MYR">MYR - Ringgit</option>
+                </select>
+                <label>🎯 Ke:</label>
+                <select id="toCurrency">
+                    <option value="USD">USD - Dolar AS</option>
+                    <option value="IDR">IDR - Rupiah</option>
+                    <option value="EUR" selected>EUR - Euro</option>
+                    <option value="JPY">JPY - Yen Jepang</option>
+                    <option value="GBP">GBP - Poundsterling</option>
+                    <option value="SGD">SGD - Dolar Singapura</option>
+                    <option value="MYR">MYR - Ringgit</option>
+                </select>
+                <button id="convertBtn">🔄 Konversi Sekarang</button>
+            </div>
+            <div class="card">
+                <div style="font-size: 14px; color: #2c7aa0;">💵 Hasil Konversi:</div>
+                <div class="currency-result" id="conversionResult">—</div>
+                <div id="rateInfo" style="font-size: 13px; text-align: center; margin-top: 12px;"></div>
+            </div>
+        </div>
+        <p style="font-size: 12px; margin-top: 12px;">✨ Kurs dari API gratis (update harian). Butuh koneksi internet.</p>
+    </div>
+
+    <!-- PANEL 2: KALKULATOR LENGKAP -->
+    <div id="tab2" class="panel">
+        <h3>🧮 Kalkulator (standar + operasi dasar)</h3>
+        <div class="calc-screen" id="calcScreen">0</div>
+        <div class="calculator-buttons" id="calcButtons">
+            <!-- akan diisi dengan JS -->
+        </div>
+    </div>
+
+    <!-- PANEL 3: NOTES CEPAT (TANPA FILE MANAGER) -->
+    <div id="tab3" class="panel">
+        <h3>📝 Notes Cepat (sementara, hilang jika refresh)</h3>
+        <textarea id="quickNote" rows="6" placeholder="Tulis catatan apapun di sini...&#10;Contoh:&#10;- Beli telur&#10;- Kode OTP: 123456&#10;- Ide proyek baru" style="font-family: monospace;"></textarea>
+        <button id="copyNoteBtn">📋 Salin Notes</button>
+        <button id="clearNoteBtn">🗑️ Kosongkan Notes</button>
+        <div class="card" style="margin-top: 16px;">
+            ⚡ Catatan hanya tersimpan di halaman ini. Reload akan hilang.<br>
+            Gunakan tombol salin untuk menyimpan ke clipboard.
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // TAB SYSTEM
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.panel');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                tabs.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                panels.forEach(panel => panel.classList.remove('active-panel'));
+                document.getElementById(tabId).classList.add('active-panel');
+            });
+        });
+
+        // ========== 1. KONVERTER MATA UANG (API REAL) ==========
+        const amountInput = document.getElementById('amount');
+        const fromCurr = document.getElementById('fromCurrency');
+        const toCurr = document.getElementById('toCurrency');
+        const convertBtn = document.getElementById('convertBtn');
+        const conversionResult = document.getElementById('conversionResult');
+        const rateInfo = document.getElementById('rateInfo');
+
+        async function convertCurrency() {
+            const amount = parseFloat(amountInput.value);
+            if (isNaN(amount)) {
+                conversionResult.innerText = '❌ Masukkan angka';
+                return;
+            }
+            const from = fromCurr.value;
+            const to = toCurr.value;
+            if (from === to) {
+                conversionResult.innerText = `${amount.toFixed(2)} ${from}`;
+                rateInfo.innerText = 'Mata uang sama';
+                return;
+            }
+            try {
+                const url = `https://api.exchangerate-api.com/v4/latest/${from}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                const rate = data.rates[to];
+                if (rate) {
+                    const result = amount * rate;
+                    conversionResult.innerText = `${result.toFixed(2)} ${to}`;
+                    rateInfo.innerText = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+                } else {
+                    conversionResult.innerText = 'Kurs tidak tersedia';
+                }
+            } catch (err) {
+                conversionResult.innerText = 'Gagal ambil kurs, cek koneksi';
+                rateInfo.innerText = '';
+            }
+        }
+        convertBtn.addEventListener('click', convertCurrency);
+        convertCurrency();
+
+        // ========== 2. KALKULATOR ==========
+        const calcScreen = document.getElementById('calcScreen');
+        let currentInput = '0';
+        let prevValue = null;
+        let currentOperation = null;
+        let waitingForOperand = false;
+
+        function updateScreen() {
+            calcScreen.innerText = currentInput.length > 18 ? parseFloat(currentInput).toExponential(10) : currentInput;
+        }
+
+        function inputDigit(digit) {
+            if (waitingForOperand) {
+                currentInput = String(digit);
+                waitingForOperand = false;
+            } else {
+                currentInput = currentInput === '0' ? String(digit) : currentInput + digit;
+            }
+            updateScreen();
+        }
+
+        function inputDecimal() {
+            if (waitingForOperand) {
+                currentInput = '0.';
+                waitingForOperand = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateScreen();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            prevValue = null;
+            currentOperation = null;
+            waitingForOperand = false;
+            updateScreen();
+        }
+
+        function performOperation(nextOp) {
+            const inputVal = parseFloat(currentInput);
+            if (prevValue === null) {
+                prevValue = inputVal;
+            } else if (currentOperation) {
+                let result = 0;
+                switch (currentOperation) {
+                    case '+': result = prevValue + inputVal; break;
+                    case '-': result = prevValue - inputVal; break;
+                    case '*': result = prevValue * inputVal; break;
+                    case '/': result = prevValue / inputVal; break;
+                    default: return;
+                }
+                prevValue = result;
+                currentInput = String(result);
+                updateScreen();
+            }
+            waitingForOperand = true;
+            currentOperation = nextOp;
+        }
+
+        function buildCalculator() {
+            const container = document.getElementById('calcButtons');
+            const buttons = [
+                '7', '8', '9', '/',
+                '4', '5', '6', '*',
+                '1', '2', '3', '-',
+                '0', '.', '=', '+',
+                'C'
+            ];
+            container.innerHTML = '';
+            buttons.forEach(btn => {
+                const div = document.createElement('div');
+                div.className = 'calc-btn';
+                div.innerText = btn;
+                div.addEventListener('click', () => {
+                    if (btn >= '0' && btn <= '9') inputDigit(parseInt(btn));
+                    else if (btn === '.') inputDecimal();
+                    else if (btn === 'C') clearAll();
+                    else if (btn === '=') {
+                        if (currentOperation && !waitingForOperand) {
+                            performOperation(currentOperation);
+                            currentOperation = null;
+                            prevValue = null;
+                            waitingForOperand = false;
+                        }
+                    } else if (['+', '-', '*', '/'].includes(btn)) {
+                        performOperation(btn);
+                    }
+                });
+                container.appendChild(div);
+            });
+        }
+        buildCalculator();
+
+        // ========== 3. NOTES CEPAT (tanpa file manager, hanya temporary) ==========
+        const quickNote = document.getElementById('quickNote');
+        const copyNoteBtn = document.getElementById('copyNoteBtn');
+        const clearNoteBtn = document.getElementById('clearNoteBtn');
+
+        copyNoteBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(quickNote.value);
+            alert('✅ Notes disalin ke clipboard');
+        });
+        clearNoteBtn.addEventListener('click', () => {
+            if (confirm('Kosongkan notes? (tidak bisa dikembalikan)')) {
+                quickNote.value = '';
+            }
+        });
+
+        // Opsional: simpan sementara saat typing ke sessionStorage (biar gak hilang kalo pindah tab)
+        quickNote.addEventListener('input', () => {
+            sessionStorage.setItem('ibil_temp_note', quickNote.value);
+        });
+        const savedNote = sessionStorage.getItem('ibil_temp_note');
+        if (savedNote) quickNote.value = savedNote;
+    })();
+</script>
+</body>
+</html>
